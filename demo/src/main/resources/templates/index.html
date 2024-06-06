@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Batería</title>
+    <style>
+        .centrar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            position: relative;
+        }
+
+        .cuadrado {
+            width: 50px;
+            height: 50px;
+            background-color: blue;
+            position: relative;
+            animation: move 2s infinite alternate; 
+        }
+
+        .card-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .card {
+            width: 300px;
+            height: 200px;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+            transition: box-shadow 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            position: relative;
+        }
+
+        h4 {
+            display: none;
+            color: rgba(255, 0, 0, 0.5);
+        }
+
+        .mensaje {
+            display: none;
+            color: green;
+            margin-top: 10px;
+        }
+
+        @keyframes move {
+            from {
+                left: 0; 
+            }
+            to {
+                left: calc(100% - 50px); 
+            }
+        }
+
+        body.bateriaBaja .card {
+            box-shadow: 0 2px 4px rgba(255, 0, 0, 0.5); 
+        }
+
+        body.bateriaBaja .cuadrado {
+            animation: none; 
+        }
+
+        body.bateriaBaja h4 {
+            display: block; 
+        }
+
+        body.cargando .mensaje {
+            display: block;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>Estado de la batería</h1>
+    <div class="cuadrado"></div>
+    <div class="centrar">
+        <div class="card">
+            <h4>Batería baja</h4>
+            <div class="mensaje">Cargando...</div>
+        </div>
+
+    </div>
+    
+
+    <script>
+        async function checkBattery() {
+            if (navigator.getBattery) {
+                const bateriaCompu = await navigator.getBattery();
+
+                function updateBatteryStatus() {
+                    if (bateriaCompu.level < 0.10 && !bateriaCompu.charging) {
+                        document.body.classList.add('bateriaBaja');
+                    } else {
+                        document.body.classList.remove('bateriaBaja');
+                    }
+
+                    if (bateriaCompu.charging) {
+                        document.body.classList.add('cargando');
+                    } else {
+                        document.body.classList.remove('cargando');
+                    }
+                }
+
+                bateriaCompu.addEventListener('levelchange', updateBatteryStatus);
+                bateriaCompu.addEventListener('chargingchange', updateBatteryStatus);
+                updateBatteryStatus();
+            } else {
+                console.log('Battery API is not supported on this browser.');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', checkBattery);
+    </script>
+</body>
+</html>
